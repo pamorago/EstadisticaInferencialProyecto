@@ -1,31 +1,146 @@
-html {
-  font-size: 14px;
-}
+/* ══════════════════════════════════════════════════════════════════════════
+   EI — Estadística Inferencial  |  site.css
+   ════════════════════════════════════════════════════════════════════════ */
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
+html { font-size: 14px; }
+@media (min-width: 768px) { html { font-size: 16px; } }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
+html { position: relative; min-height: 100%; }
+body { margin-bottom: 60px; }
 
-html {
-  position: relative;
-  min-height: 100%;
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+.hero-banner {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 60%, #084298 100%);
+    border-radius: .75rem;
+    padding: 2.2rem 2rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
 }
+.hero-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.hero-title  { font-size: 1.85rem; font-weight: 700; margin-bottom: .25rem; }
+.hero-sub    { font-size: .95rem;  opacity: .85;    margin-bottom: 0; }
+.hero-badges { display: flex; flex-direction: column; gap: .4rem; text-align: right; }
+.badge-stat  { background: rgba(255,255,255,.18); border-radius: 1rem;
+               padding: .3rem .8rem; font-size: .82rem; backdrop-filter: blur(4px); }
 
-body {
-  margin-bottom: 60px;
+/* ── Param bar ────────────────────────────────────────────────────────────── */
+.param-bar {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: .65rem;
+    padding: 1.2rem 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+    align-items: start;
 }
+.param-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: .4rem;
+    display: block;
+}
+.param-range-labels { font-size: .85rem; color: #6c757d; margin-top: .15rem; }
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+.param-num-input {
+    width: 90px;
+    flex-shrink: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: monospace;
+    text-align: center;
+    border: 1px solid #ced4da;
+    border-radius: .4rem;
+    padding: .3rem .4rem;
+    background: #fff;
+}
+.param-num-input:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 2px rgba(13,110,253,.2);
+}
+.btn-recalcular { font-size: 1rem; font-weight: 600; letter-spacing: .03em; padding: .6rem; }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* ── Section card ─────────────────────────────────────────────────────────── */
+.section-card   { border: 1px solid #dee2e6; border-radius: .75rem; overflow: hidden; }
+.section-header { padding: .75rem 1.25rem; display: flex; align-items: center; gap: .75rem; }
+.section-letter {
+    width: 2.1rem; height: 2.1rem; border-radius: 50%;
+    background: rgba(255,255,255,.25);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; font-weight: 800; color: #fff;
+    flex-shrink: 0;
 }
+.section-title  { font-size: 1.15rem; font-weight: 700; color: #fff; margin: 0; }
+.section-body   { padding: 1.5rem; }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+/* ── Stat cards ───────────────────────────────────────────────────────────── */
+.stat-card {
+    border-radius: .65rem; padding: 1.2rem 1rem;
+    text-align: center; border: 1px solid #dee2e6;
 }
+.stat-general { background: #f8f9fa; }
+.stat-hombre  { background: #e7f1ff; border-color: #b6d4fe; }
+.stat-mujer   { background: #fde8e8; border-color: #f5c2c7; }
+.stat-icon    { font-size: 1.6rem; margin-bottom: .3rem; }
+.stat-value   { font-size: 1.35rem; font-weight: 700; }
+.stat-label   { font-size: .8rem;  color: #6c757d; margin: .25rem 0 .15rem; }
+.stat-n       { font-size: .75rem; color: #adb5bd; }
+
+/* ── Num boxes ────────────────────────────────────────────────────────────── */
+.num-box {
+    background: #f8f9fa; border: 1px solid #dee2e6;
+    border-radius: .55rem; padding: .9rem .75rem; text-align: center;
+}
+.num-val       { font-size: 1.2rem; font-weight: 700; font-family: monospace; }
+.num-lbl       { font-size: .78rem; color: #6c757d; margin-top: .2rem; }
+.num-box-danger  { background: #fff5f5; border-color: #f5c2c7; }
+.num-box-warning { background: #fffbf0; border-color: #ffe69c; }
+
+/* ── Formula box ──────────────────────────────────────────────────────────── */
+.formula-box {
+    background: #1e2330; border-radius: .6rem;
+    padding: 1rem 1.4rem; border-left: 4px solid #0d6efd;
+}
+.formula-text { font-size: 1.05rem; color: #e9ecef; margin-bottom: .4rem; }
+.formula-sub  { font-size: .82rem;  color: #adb5bd; margin-bottom: 0; }
+
+/* ── IC result ────────────────────────────────────────────────────────────── */
+.ic-result {
+    display: flex; align-items: baseline; justify-content: center;
+    gap: .4rem; flex-wrap: wrap; text-align: center;
+}
+.ic-bracket { font-size: 3.5rem; line-height: 1; color: #198754; font-weight: 300; }
+.ic-val     { font-size: 2rem; font-weight: 700; font-family: monospace; color: #198754; }
+.ic-sep     { font-size: 1.6rem; color: #6c757d; }
+.ic-label   { width: 100%; font-size: .88rem; color: #6c757d; margin-top: .3rem; }
+
+/* ── Hipótesis box ────────────────────────────────────────────────────────── */
+.hipotesis-box {
+    background: #fff8e1; border: 1px solid #ffe69c;
+    border-radius: .6rem; padding: 1rem 1.4rem;
+}
+.hip-row   { display: flex; align-items: baseline; gap: .7rem; margin-bottom: .4rem; }
+.hip-row:last-child { margin-bottom: 0; }
+.hip-label { font-weight: 700; font-family: monospace; min-width: 3.5rem; color: #664d03; }
+.hip-text  { font-size: .9rem; color: #332701; }
+
+/* ── Patient table ────────────────────────────────────────────────────────── */
+.tabla-pacientes thead th { font-size: .78rem; white-space: nowrap; }
+.tabla-pacientes tbody td { font-size: .8rem; }
+.row-hombre { background-color: rgba(13,110,253,.05) !important; }
+.row-mujer  { background-color: rgba(220,53,69,.05)  !important; }
+.bg-pink    { background-color: #d63384 !important; }
