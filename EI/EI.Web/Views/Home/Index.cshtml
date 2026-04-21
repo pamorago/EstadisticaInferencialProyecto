@@ -2,535 +2,551 @@
 @using System.Text.Json
 @using System.Globalization
 @{
-    ViewData["Title"] = "Estadística Inferencial";
+    ViewData["Title"] = "Estadistica Inferencial";
     var inv = CultureInfo.InvariantCulture;
     var jsonOpts = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
     var pacientesJson = JsonSerializer.Serialize(Model.Pacientes, jsonOpts);
+    bool rechaza = Model.RechazaH0;
 }
 
-<!-- ══ HERO ══════════════════════════════════════════════════════════════ -->
+<!-- â•â• HERO â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="hero-banner mb-4">
     <div class="hero-inner">
         <div>
-            <h1 class="hero-title"><i class="bi bi-activity me-2"></i>Estadística Inferencial</h1>
-            <p class="hero-sub">Análisis de pacientes · Base de datos de salud 2026</p>
+            <h1 class="hero-title"><i class="bi bi-activity me-2"></i>Estadistica Inferencial</h1>
+            <p class="hero-sub">Analisis de pacientes &middot; Base de datos de salud 2026 &middot; Prof. Sandra Rodriguez Herrera</p>
         </div>
         <div class="hero-badges">
-            <span class="badge-stat">n = @Model.NTotal pacientes</span>
-            <span class="badge-stat">@Model.NHombres hombres &nbsp;·&nbsp; @Model.NMujeres mujeres</span>
+            <span class="hbadge"><i class="bi bi-people-fill me-1"></i>n = @Model.NTotal pacientes</span>
+            <span class="hbadge"><i class="bi bi-gender-male me-1"></i>@Model.NHombres hombres</span>
+            <span class="hbadge"><i class="bi bi-gender-female me-1"></i>@Model.NMujeres mujeres</span>
         </div>
     </div>
 </div>
 
-<!-- ══ FORMULARIO DE PARÁMETROS ══════════════════════════════════════════ -->
+<!-- â•â• FORMULARIO DE PARAMETROS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <form method="post" id="frmParametros">
     @Html.AntiForgeryToken()
-    <div class="param-bar mb-4">
-
-        <!-- Nivel de confianza -->
+    <div class="param-bar mb-1">
         <div class="param-group">
-            <label class="param-label">Nivel de confianza (IC)</label>
+            <label class="param-label">
+                <i class="bi bi-percent me-1 text-primary"></i>Nivel de confianza (IC)
+            </label>
             <div class="slider-row">
                 <input type="range" id="rngConfianza" min="0.800" max="0.999" step="0.001"
                        value="@Model.NivelConfianza.ToString("F3", inv)" class="form-range flex-grow-1"
-                       oninput="syncParam('Confianza', this.value, v => (v*100).toFixed(1)+'%')" />
+                       oninput="syncParam('Confianza',this.value)" />
                 <input type="number" id="numConfianza" name="nivelConfianza" min="0.800" max="0.999" step="0.001"
                        value="@Model.NivelConfianza.ToString("F3", inv)" class="param-num-input"
-                       oninput="syncParam('Confianza', this.value, v => (v*100).toFixed(1)+'%')" />
+                       oninput="syncParam('Confianza',this.value)" />
             </div>
             <div class="d-flex justify-content-between param-range-labels"><span>80%</span><span>99.9%</span></div>
         </div>
-
-        <!-- IMC poblacional -->
         <div class="param-group">
-            <label class="param-label">IMC poblacional (μ₀)</label>
+            <label class="param-label">
+                <i class="bi bi-person-fill me-1 text-warning"></i>IMC poblacional (&mu;&#8320;)
+            </label>
             <div class="slider-row">
                 <input type="range" id="rngMedia" min="18" max="40" step="0.1"
                        value="@Model.MediaPoblacionalImc.ToString("F1", inv)" class="form-range flex-grow-1"
-                       oninput="syncParam('Media', this.value, v => parseFloat(v).toFixed(1))" />
+                       oninput="syncParam('Media',this.value)" />
                 <input type="number" id="numMedia" name="mediaPoblacionalImc" min="18" max="40" step="0.1"
                        value="@Model.MediaPoblacionalImc.ToString("F1", inv)" class="param-num-input"
-                       oninput="syncParam('Media', this.value, v => parseFloat(v).toFixed(1))" />
+                       oninput="syncParam('Media',this.value)" />
             </div>
             <div class="d-flex justify-content-between param-range-labels"><span>18</span><span>40</span></div>
         </div>
-
-        <!-- Significancia -->
         <div class="param-group">
-            <label class="param-label">Significancia (α)</label>
+            <label class="param-label">
+                <i class="bi bi-shield-exclamation me-1 text-danger"></i>Significancia (&alpha;)
+            </label>
             <div class="slider-row">
                 <input type="range" id="rngAlpha" min="0.001" max="0.200" step="0.001"
                        value="@Model.NivelSignificancia.ToString("F3", inv)" class="form-range flex-grow-1"
-                       oninput="syncParam('Alpha', this.value, v => parseFloat(v).toFixed(3))" />
+                       oninput="syncParam('Alpha',this.value)" />
                 <input type="number" id="numAlpha" name="nivelSignificancia" min="0.001" max="0.200" step="0.001"
                        value="@Model.NivelSignificancia.ToString("F3", inv)" class="param-num-input"
-                       oninput="syncParam('Alpha', this.value, v => parseFloat(v).toFixed(3))" />
+                       oninput="syncParam('Alpha',this.value)" />
             </div>
             <div class="d-flex justify-content-between param-range-labels"><span>0.001</span><span>0.200</span></div>
         </div>
-
         <div class="param-group d-flex align-items-end">
             <button type="submit" class="btn btn-primary w-100 btn-recalcular">
-                <i class="bi bi-calculator me-1"></i> Recalcular
+                <i class="bi bi-calculator-fill me-1"></i>Recalcular
             </button>
         </div>
     </div>
 </form>
 
-<script>
-    function syncParam(key, rawVal, fmt) {
-        const v = parseFloat(rawVal);
-        if (isNaN(v)) return;
-        const rng = document.getElementById('rng' + key);
-        const num = document.getElementById('num' + key);
-        // Solo actualizar el otro control para evitar bucle
-        if (document.activeElement === rng) {
-            num.value = fmt ? v.toString() : rawVal;
-        } else {
-            rng.value = v;
-        }
-    }
-</script>
+<!-- â•â• TABS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<ul class="nav nav-tabs ei-tabs" id="mainTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-a-btn" data-bs-toggle="tab" data-bs-target="#tab-a" type="button" role="tab">
+            <i class="bi bi-bar-chart-line-fill me-1"></i>a) Promedios de Pesos
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-b-btn" data-bs-toggle="tab" data-bs-target="#tab-b" type="button" role="tab">
+            <i class="bi bi-arrows-expand me-1"></i>b) Intervalo de Confianza
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-c-btn" data-bs-toggle="tab" data-bs-target="#tab-c" type="button" role="tab">
+            <i class="bi bi-clipboard2-pulse-fill me-1"></i>c) Prueba de Hipotesis
+            @if (rechaza) { <span class="badge bg-danger ms-1">H&#8320; Rechazada</span> }
+            else { <span class="badge bg-warning text-dark ms-1">No Rechaza</span> }
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-datos-btn" data-bs-toggle="tab" data-bs-target="#tab-datos" type="button" role="tab">
+            <i class="bi bi-table me-1"></i>Base de Datos
+        </button>
+    </li>
+</ul>
 
-<!-- ══ a) PROMEDIOS DE PESOS ══════════════════════════════════════════════ -->
-<div class="section-card mb-4">
-    <div class="section-header bg-primary">
-        <span class="section-letter">a</span>
-        <h2 class="section-title">Promedios de Pesos</h2>
+<div class="tab-content ei-tab-content">
+
+<!-- â•â• TAB a) PROMEDIOS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div class="tab-pane fade show active" id="tab-a" role="tabpanel">
+    <div class="tab-header tab-header-primary">
+        <i class="bi bi-bar-chart-line-fill me-2"></i>Promedios de Pesos &mdash; General, Hombres y Mujeres
     </div>
-    <div class="section-body">
+    <div class="tab-body">
         <div class="row g-3 mb-4">
             <div class="col-md-4">
-                <div class="stat-card stat-general">
-                    <div class="stat-icon">⚖️</div>
-                    <div class="stat-value">@Model.PromedioGeneralPeso.ToString("F2") kg</div>
-                    <div class="stat-label">Promedio General</div>
-                    <div class="stat-n">n = @Model.NTotal</div>
+                <div class="kpi-card kpi-general">
+                    <div class="kpi-icon">&#9878;</div>
+                    <div class="kpi-val">@Model.PromedioGeneralPeso.ToString("F2") kg</div>
+                    <div class="kpi-lbl">Promedio General</div>
+                    <div class="kpi-sub">n = @Model.NTotal</div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stat-card stat-hombre">
-                    <div class="stat-icon">👨</div>
-                    <div class="stat-value">@Model.PromedioHombresPeso.ToString("F2") kg</div>
-                    <div class="stat-label">Promedio Hombres (x̄₁)</div>
-                    <div class="stat-n">n₁ = @Model.NHombres &nbsp;|&nbsp; s₁ = @Model.S1Hombres.ToString("F2")</div>
+                <div class="kpi-card kpi-hombre">
+                    <div class="kpi-icon"><i class="bi bi-gender-male" style="font-size:2rem"></i></div>
+                    <div class="kpi-val">@Model.PromedioHombresPeso.ToString("F2") kg</div>
+                    <div class="kpi-lbl">Promedio Hombres (x&#773;&#8321;)</div>
+                    <div class="kpi-sub">n&#8321; = @Model.NHombres &nbsp;&middot;&nbsp; s&#8321; = @Model.S1Hombres.ToString("F2") kg</div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stat-card stat-mujer">
-                    <div class="stat-icon">👩</div>
-                    <div class="stat-value">@Model.PromedioMujeresPeso.ToString("F2") kg</div>
-                    <div class="stat-label">Promedio Mujeres (x̄₂)</div>
-                    <div class="stat-n">n₂ = @Model.NMujeres &nbsp;|&nbsp; s₂ = @Model.S2Mujeres.ToString("F2")</div>
+                <div class="kpi-card kpi-mujer">
+                    <div class="kpi-icon"><i class="bi bi-gender-female" style="font-size:2rem"></i></div>
+                    <div class="kpi-val">@Model.PromedioMujeresPeso.ToString("F2") kg</div>
+                    <div class="kpi-lbl">Promedio Mujeres (x&#773;&#8322;)</div>
+                    <div class="kpi-sub">n&#8322; = @Model.NMujeres &nbsp;&middot;&nbsp; s&#8322; = @Model.S2Mujeres.ToString("F2") kg</div>
                 </div>
             </div>
         </div>
-        <div class="row g-3">
+        <div class="row g-4">
             <div class="col-lg-5">
-                <canvas id="chartPromedios" height="260"></canvas>
+                <div class="chart-card">
+                    <div class="chart-title"><i class="bi bi-bar-chart-fill me-1"></i>Promedio por Grupo</div>
+                    <canvas id="chartPromedios"></canvas>
+                </div>
             </div>
             <div class="col-lg-7">
-                <canvas id="chartPesos" height="260"></canvas>
+                <div class="chart-card">
+                    <div class="chart-title"><i class="bi bi-graph-up-arrow me-1"></i>Distribucion Individual de Pesos</div>
+                    <canvas id="chartPesos"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ══ b) INTERVALO DE CONFIANZA ══════════════════════════════════════════ -->
-<div class="section-card mb-4">
-    <div class="section-header bg-success">
-        <span class="section-letter">b</span>
-        <h2 class="section-title">
-            Intervalo de Confianza — Diferencia de Medias de Pesos
-            <span class="badge bg-light text-success ms-2 fs-6">@((Model.NivelConfianza*100).ToString("F1"))%</span>
-        </h2>
+<!-- â•â• TAB b) INTERVALO DE CONFIANZA â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div class="tab-pane fade" id="tab-b" role="tabpanel">
+    <div class="tab-header tab-header-primary">
+        <i class="bi bi-arrows-expand me-2"></i>
+        Intervalo de Confianza al @((Model.NivelConfianza * 100).ToString("F1"))% &mdash; Diferencia de Medias de Pesos
     </div>
-    <div class="section-body">
-        <div class="formula-box mb-4">
+    <div class="tab-body">
+        <div class="formula-box formula-orange mb-4">
+            <div class="formula-title">Formula aplicada (t de Welch &mdash; varianzas desiguales)</div>
             <p class="formula-text">
-                IC<sub>@((Model.NivelConfianza*100).ToString("F0"))%</sub>(μ₁ − μ₂) &nbsp;=&nbsp;
-                (x̄₁ − x̄₂) &plusmn; t<sub>α/2, ν</sub> · √(s₁²/n₁ + s₂²/n₂)
+                IC<sub>@((Model.NivelConfianza*100).ToString("F0"))%</sub>(&mu;&#8321; &minus; &mu;&#8322;)
+                &nbsp;=&nbsp; (x&#773;&#8321; &minus; x&#773;&#8322;) &plusmn; t<sub>&alpha;/2, &nu;</sub> &middot;
+                &radic;(s&#8321;&sup2;/n&#8321; + s&#8322;&sup2;/n&#8322;)
             </p>
             <p class="formula-sub">
-                Prueba t de Welch (varianzas no iguales) &nbsp;·&nbsp; α = @((1 - Model.NivelConfianza).ToString("F3"))
+                &alpha; = @((1 - Model.NivelConfianza).ToString("F3")) &nbsp;&middot;&nbsp;
+                &alpha;/2 = @(((1 - Model.NivelConfianza) / 2).ToString("F4")) &nbsp;&middot;&nbsp;
+                &nu; (Welch&ndash;Satterthwaite) = @Model.GradosLibertad.ToString("F2")
             </p>
         </div>
-        <div class="row g-3 mb-4">
-            <div class="col-6 col-md-3">
-                <div class="num-box">
-                    <div class="num-val">@Model.DiferenciaMedias.ToString("F4")</div>
-                    <div class="num-lbl">x̄₁ − x̄₂ (kg)</div>
+
+        <div class="steps-grid mb-4">
+            <div class="step-box">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <div class="step-title">Diferencia de medias</div>
+                    <div class="step-val">x&#773;&#8321; &minus; x&#773;&#8322; = @Model.PromedioHombresPeso.ToString("F4") &minus; @Model.PromedioMujeresPeso.ToString("F4") = <strong>@Model.DiferenciaMedias.ToString("F4") kg</strong></div>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="num-box">
-                    <div class="num-val">@Model.ErrorEstandar.ToString("F4")</div>
-                    <div class="num-lbl">Error Estándar</div>
+            <div class="step-box">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <div class="step-title">Error estandar</div>
+                    <div class="step-val">&radic;(s&#8321;&sup2;/n&#8321; + s&#8322;&sup2;/n&#8322;) = <strong>@Model.ErrorEstandar.ToString("F4")</strong></div>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="num-box">
-                    <div class="num-val">@Model.GradosLibertad.ToString("F2")</div>
-                    <div class="num-lbl">Grados de libertad ν</div>
+            <div class="step-box">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <div class="step-title">t critico</div>
+                    <div class="step-val">t<sub>@(((1-Model.NivelConfianza)/2).ToString("F4")), @Model.GradosLibertad.ToString("F1")</sub> = <strong>@Model.TCritico.ToString("F4")</strong></div>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="num-box">
-                    <div class="num-val">@Model.TCritico.ToString("F4")</div>
-                    <div class="num-lbl">t<sub>α/2, ν</sub> crítico</div>
+            <div class="step-box step-box-orange">
+                <div class="step-num step-num-orange">&#10003;</div>
+                <div class="step-body">
+                    <div class="step-title">Margen de error</div>
+                    <div class="step-val">@Model.TCritico.ToString("F4") &times; @Model.ErrorEstandar.ToString("F4") = <strong>@((Model.TCritico * Model.ErrorEstandar).ToString("F4")) kg</strong></div>
                 </div>
             </div>
         </div>
-        <div class="ic-result mb-4">
-            <span class="ic-bracket">[</span>
-            <span class="ic-val">@Model.ICLimiteInferior.ToString("F4")</span>
-            <span class="ic-sep">&nbsp;,&nbsp;</span>
-            <span class="ic-val">@Model.ICLimiteSuperior.ToString("F4")</span>
-            <span class="ic-bracket">]</span>
-            <div class="ic-label">kg &nbsp;·&nbsp; @((Model.NivelConfianza*100).ToString("F1"))% de confianza</div>
+
+        <div class="ic-result-box mb-4">
+            <div class="ic-label-top">Intervalo de Confianza al @((Model.NivelConfianza * 100).ToString("F1"))%</div>
+            <div class="ic-values">
+                <span class="ic-bracket">[</span>
+                <span class="ic-val">@Model.ICLimiteInferior.ToString("F4")</span>
+                <span class="ic-sep">,</span>
+                <span class="ic-val">@Model.ICLimiteSuperior.ToString("F4")</span>
+                <span class="ic-bracket">]</span>
+                <span class="ic-unit">kg</span>
+            </div>
         </div>
-        <div class="alert alert-success interpretation">
-            <strong>Interpretación:</strong> Con un @((Model.NivelConfianza*100).ToString("F1"))% de confianza,
-            la diferencia promedio de peso entre hombres y mujeres se encuentra entre
-            <strong>@Model.ICLimiteInferior.ToString("F2") kg</strong> y
-            <strong>@Model.ICLimiteSuperior.ToString("F2") kg</strong>.
+
+        <div class="alert @(Model.ICLimiteInferior > 0 || Model.ICLimiteSuperior < 0 ? "alert-danger" : "alert-warning") mb-4">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <strong>Interpretacion:</strong> Con un @((Model.NivelConfianza*100).ToString("F1"))% de confianza,
+            la diferencia promedio de peso entre hombres y mujeres esta entre
+            <strong>@Model.ICLimiteInferior.ToString("F4") kg</strong> y
+            <strong>@Model.ICLimiteSuperior.ToString("F4") kg</strong>.
             @if (Model.ICLimiteInferior > 0 || Model.ICLimiteSuperior < 0)
             {
-                <text>El intervalo no contiene el cero — existe diferencia significativa entre grupos.</text>
+                <text>El intervalo <strong>no contiene el cero</strong> &mdash; existe diferencia significativa entre grupos.</text>
             }
             else
             {
-                <text>El intervalo contiene el cero — no hay diferencia significativa entre grupos.</text>
+                <text>El intervalo <strong>contiene el cero</strong> &mdash; no hay diferencia estadisticamente significativa.</text>
             }
         </div>
-        <canvas id="chartIC" height="110"></canvas>
+
+        <div class="chart-card">
+            <div class="chart-title"><i class="bi bi-arrows-expand me-1"></i>Visualizacion del Intervalo de Confianza</div>
+            <canvas id="chartIC" height="110"></canvas>
+        </div>
     </div>
 </div>
 
-<!-- ══ c) PRUEBA DE HIPÓTESIS IMC ════════════════════════════════════════ -->
-@{
-    bool rechaza = Model.RechazaH0;
-    string aClass = rechaza ? "alert-danger" : "alert-warning";
-    string hdrClass = rechaza ? "bg-danger" : "bg-warning";
-    string tColor = rechaza ? "" : "text-dark";
-}
-<div class="section-card mb-4">
-    <div class="section-header @hdrClass">
-        <span class="section-letter">c</span>
-        <h2 class="section-title @tColor">Prueba de Hipótesis — IMC Promedio</h2>
+<!-- â•â• TAB c) PRUEBA DE HIPOTESIS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div class="tab-pane fade" id="tab-c" role="tabpanel">
+    <div class="tab-header @(rechaza ? "tab-header-danger" : "tab-header-warning")">
+        <i class="bi bi-clipboard2-pulse-fill me-2"></i>Prueba de Hipotesis &mdash; IMC Promedio
+        @if (rechaza) { <span class="ms-3 badge bg-white text-danger">H&#8320; RECHAZADA</span> }
+        else { <span class="ms-3 badge bg-white text-warning">NO SE RECHAZA H&#8320;</span> }
     </div>
-    <div class="section-body">
+    <div class="tab-body">
         <div class="hipotesis-box mb-4">
             <div class="hip-row">
-                <span class="hip-label">H₀ :</span>
-                <span class="hip-text">μ<sub>IMC</sub> &ge; @Model.MediaPoblacionalImc.ToString("F1") &nbsp;(la media
-                    muestral no es menor que el valor poblacional)</span>
+                <span class="hip-label hip-label-h0">H&#8320;</span>
+                <span class="hip-text">&mu;<sub>IMC</sub> &ge; @Model.MediaPoblacionalImc.ToString("F1") &nbsp;(el IMC promedio no es menor que el poblacional)</span>
+            </div>
+            <div class="hip-row">
+                <span class="hip-label hip-label-h1">H&#8321;</span>
+                <span class="hip-text">&mu;<sub>IMC</sub> &lt; @Model.MediaPoblacionalImc.ToString("F1") &nbsp;(el IMC promedio es menor &mdash; prueba una cola inferior)</span>
+            </div>
+            <div class="hip-row hip-row-last">
+                <span class="hip-label hip-label-tipo">Tipo</span>
+                <span class="hip-text">Una cola izquierda &nbsp;&middot;&nbsp; &alpha; = @Model.NivelSignificancia.ToString("F3") &nbsp;&middot;&nbsp; s muestral &nbsp;&middot;&nbsp; &nu; = @(Model.NTotal - 1)</span>
+            </div>
+        </div>
+
+        <div class="formula-box @(rechaza ? "formula-red" : "formula-yellow") mb-4">
+            <div class="formula-title">Estadistico de prueba (t de Student, una cola inferior)</div>
+            <p class="formula-text">
+                t = (x&#773; &minus; &mu;&#8320;) / (s / &radic;n) = (@Model.PromedioImcMuestra.ToString("F4") &minus; @Model.MediaPoblacionalImc.ToString("F1")) / (@Model.DesviacionImcMuestra.ToString("F4") / &radic;@Model.NTotal) = <strong>@Model.TEstadistico.ToString("F4")</strong>
+            </p>
+            <p class="formula-sub">
+                p-valor = P(T &lt; @Model.TEstadistico.ToString("F4") | &nu; = @(Model.NTotal-1)) = <strong>@Model.ValorP.ToString("F6")</strong>
+                &nbsp;&middot;&nbsp; t critico = <strong>@Model.TCriticoHipotesis.ToString("F4")</strong>
+            </p>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="num-box"><div class="num-val">@Model.PromedioImcMuestra.ToString("F4")</div><div class="num-lbl">x&#773; IMC muestra</div></div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="num-box"><div class="num-val">@Model.DesviacionImcMuestra.ToString("F4")</div><div class="num-lbl">Desv. estandar (s)</div></div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="num-box"><div class="num-val">@Model.TEstadistico.ToString("F4")</div><div class="num-lbl">Estadistico t</div></div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="num-box @(rechaza ? "num-box-danger" : "num-box-warning")">
+                    <div class="num-val">@Model.ValorP.ToString("F6")</div><div class="num-lbl">p-valor</div>
                 </div>
-                <div class="hip-row">
-                    <span class="hip-label">H₁ :</span>
-                    <span class="hip-text">μ<sub>IMC</sub> &lt; @Model.MediaPoblacionalImc.ToString("F1") &nbsp;(la media
-                        muestral es menor — prueba una cola inferior)</span>
-                    </div>
-                    <div class="hip-row">
-                        <span class="hip-label">Tipo :</span>
-                        <span class="hip-text">Una cola izquierda &nbsp;·&nbsp; α = @Model.NivelSignificancia.ToString("F3")
-                            &nbsp;·&nbsp; s de la muestra</span>
-                        </div>
-                    </div>
-                    <div class="formula-box mb-4">
-                        <p class="formula-text">
-                            t = (x̄ − μ₀) / (s / √n) &nbsp;=&nbsp;
-                            (@Model.PromedioImcMuestra.ToString("F4") − @Model.MediaPoblacionalImc.ToString("F1")) /
-                            (@Model.DesviacionImcMuestra.ToString("F4") / √@Model.NTotal)
-                            &nbsp;= <strong>@Model.TEstadistico.ToString("F4")</strong>
-                        </p>
-                        <p class="formula-sub">
-                            p-valor = P(T &lt; @Model.TEstadistico.ToString("F4") | ν = @(Model.NTotal - 1)) =
-                            <strong>@Model.ValorP.ToString("F6")</strong>
-                        </p>
-                    </div>
-                    <div class="row g-3 mb-4">
-                        <div class="col-6 col-md-3">
-                            <div class="num-box">
-                                <div class="num-val">@Model.PromedioImcMuestra.ToString("F4")</div>
-                                <div class="num-lbl">x̄ IMC muestra</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="num-box">
-                                <div class="num-val">@Model.DesviacionImcMuestra.ToString("F4")</div>
-                                <div class="num-lbl">Desv. estándar (s)</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="num-box">
-                                <div class="num-val">@Model.TEstadistico.ToString("F4")</div>
-                                <div class="num-lbl">Estadístico t</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="num-box @(rechaza ? "num-box-danger" : "num-box-warning")">
-                                <div class="num-val">@Model.ValorP.ToString("F6")</div>
-                                <div class="num-lbl">p-valor</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="alert @aClass mb-4">
-                        <strong>Decisión:</strong>
-                        @if (rechaza)
-                        {
-                            <text>Se <strong>RECHAZA H₀</strong> (p = @Model.ValorP.ToString("F6") &lt; α =
-                                @Model.NivelSignificancia.ToString("F3")).
-                                Hay evidencia suficiente para concluir que el IMC promedio es significativamente menor que
-                                @Model.MediaPoblacionalImc.ToString("F1").</text>
-                            }
-            else
-                            {
-                                <text>No se rechaza H₀ (p = @Model.ValorP.ToString("F6") ≥ α = @Model.NivelSignificancia.ToString("F3")).
-                                    No hay evidencia suficiente para concluir que el IMC promedio es menor que
-                                    @Model.MediaPoblacionalImc.ToString("F1").</text>
-                                }
-                            </div>
-                            <canvas id="chartHipotesis" height="200"></canvas>
-                        </div>
-                    </div>
+            </div>
+        </div>
 
-                    <!-- ══ TABLA DE DATOS ════════════════════════════════════════════════════ -->
-                    <div class="section-card mb-5">
-                        <div class="section-header bg-secondary d-flex align-items-center">
-                            <span class="section-letter">📋</span>
-                            <h2 class="section-title ms-2">Base de Datos — Pacientes</h2>
-                            <button class="btn btn-sm btn-outline-light ms-auto" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#tablaCollapse">
-                                Mostrar / Ocultar
-                            </button>
-                        </div>
-                        <div class="collapse show" id="tablaCollapse">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-striped table-sm mb-0 tabla-pacientes">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Nombre</th>
-                                            <th>G</th>
-                                            <th>Edad</th>
-                                            <th>Peso (kg)</th>
-                                            <th>Estatura (m)</th>
-                                            <th>IMC</th>
-                                            <th>TGL</th>
-                                            <th>P. Sist.</th>
-                                            <th>P. Diast.</th>
-                                            <th>Padecimientos</th>
-                                            <th>Fecha</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var p in Model.Pacientes)
-                                        {
-                                            <tr class="@(p.Genero == "M" ? "row-hombre" : "row-mujer")">
-                                                <td>@p.Id</td>
-                                                <td>@p.Nombre</td>
-                                                <td>
-                                                    <span class="badge @(p.Genero == "M" ? "bg-primary" : "bg-pink")">
-                                                        @(p.Genero == "M" ? "H" : "M")
-                                                    </span>
-                                                </td>
-                                                <td>@p.Edad</td>
-                                                <td><strong>@p.PesoKg?.ToString("F1")</strong></td>
-                                                <td>@p.EstaturaM?.ToString("F2")</td>
-                                                <td>@p.Imc?.ToString("F2")</td>
-                                                <td>@p.TglMgDl</td>
-                                                <td>@p.PresionSistolica</td>
-                                                <td>@p.PresionDiastolica</td>
-                                                <td>@p.Padecimientos</td>
-                                                <td>@p.Fecha?.ToString("dd/MM/yyyy")</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    @section Scripts {
-                        <script>
-                            // ── Datos del servidor ───────────────────────────────────────────────────────
-                            const pacientes = @Html.Raw(pacientesJson);
-                            const hombres = pacientes.filter(p => p.genero === 'M');
-                            const mujeres = pacientes.filter(p => p.genero === 'F');
-
-                            const promedioG = @Model.PromedioGeneralPeso.ToString("F4", inv);
-                            const promedioH = @Model.PromedioHombresPeso.ToString("F4", inv);
-                            const promedioM = @Model.PromedioMujeresPeso.ToString("F4", inv);
-                            const diffMedias = @Model.DiferenciaMedias.ToString("F4", inv);
-                            const se = @Model.ErrorEstandar.ToString("F4", inv);
-                            const icLow = @Model.ICLimiteInferior.ToString("F4", inv);
-                            const icHigh = @Model.ICLimiteSuperior.ToString("F4", inv);
-                            const tStat = @Model.TEstadistico.ToString("F4", inv);
-                            const tCritHip = @Model.TCriticoHipotesis.ToString("F4", inv);  // valor negativo
-                            const nu = @(Model.NTotal - 1);
-                            const pValor = @Model.ValorP.ToString("F6", inv);
-                            const rechazaH0 = @(Model.RechazaH0 ? "true" : "false");
-                            const ncPct = '@((Model.NivelConfianza * 100).ToString("F1"))';
-
-                            // ── Colores ──────────────────────────────────────────────────────────────────
-                            const AZUL = 'rgba(13,110,253,0.85)';
-                            const ROSA = 'rgba(220,53,69,0.85)';
-                            const VERDE = 'rgba(25,135,84,0.85)';
-                            const GRIS = 'rgba(108,117,125,0.7)';
-
-                            // ── a1: Barras de promedios ──────────────────────────────────────────────────
-                            new Chart(document.getElementById('chartPromedios'), {
-                                type: 'bar',
-                                data: {
-                                    labels: ['General', 'Hombres', 'Mujeres'],
-                                    datasets: [{
-                                        label: 'Promedio de Peso (kg)',
-                                        data: [promedioG, promedioH, promedioM],
-                                        backgroundColor: [GRIS, AZUL, ROSA],
-                                        borderColor: ['#6c757d', '#0d6efd', '#dc3545'],
-                                        borderWidth: 2, borderRadius: 6
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    plugins: {
-                                        title: { display: true, text: 'Promedio de Peso por Grupo', font: { size: 14 } },
-                                        legend: { display: false },
-                                        tooltip: { callbacks: { label: ctx => ` ${ctx.raw.toFixed(2)} kg` } }
-                                    },
-                                    scales: { y: { beginAtZero: false, min: 50, title: { display: true, text: 'kg' } } }
-                                }
-                            });
-
-                            // ── a2: Dispersión individual de pesos ───────────────────────────────────────
-                            new Chart(document.getElementById('chartPesos'), {
-                                type: 'scatter',
-                                data: {
-                                    datasets: [
-                                        {
-                                            label: 'Hombres',
-                                            data: hombres.map((p, i) => ({ x: i + 1, y: Number(p.pesoKg) })),
-                                            backgroundColor: AZUL, pointRadius: 7
-                                        },
-                                        {
-                                            label: 'Mujeres',
-                                            data: mujeres.map((p, i) => ({ x: i + 1, y: Number(p.pesoKg) })),
-                                            backgroundColor: ROSA, pointRadius: 7
-                                        },
-                                        {
-                                            label: `x̄ General = ${promedioG.toFixed ? promedioG.toFixed(2) : promedioG} kg`,
-                                            data: [{ x: 0, y: promedioG }, { x: Math.max(hombres.length, mujeres.length) + 1, y: promedioG }],
-                                            type: 'line', borderColor: VERDE, borderWidth: 2,
-                                            borderDash: [6, 4], pointRadius: 0, fill: false
-                                        }
-                                    ]
-                                },
-                                options: {
-                                    responsive: true,
-                                    plugins: {
-                                        title: { display: true, text: 'Distribución Individual de Pesos', font: { size: 14 } },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: ctx => {
-                                                    if (ctx.datasetIndex < 2) {
-                                                        const arr = ctx.datasetIndex === 0 ? hombres : mujeres;
-                                                        return ` ${arr[ctx.dataIndex].nombre}: ${ctx.raw.y} kg`;
-                                                    }
-                                                    return ` ${ctx.dataset.label}`;
-                                                }
-                                            }
-                                        }
-                                    },
-                                    scales: {
-                                        x: { title: { display: true, text: 'Paciente #' } },
-                                        y: { title: { display: true, text: 'Peso (kg)' } }
-                                    }
-                                }
-                            });
-
-                            // ── b: Visualización del IC ──────────────────────────────────────────────────
-                            new Chart(document.getElementById('chartIC'), {
-                                type: 'bar',
-                                data: {
-                                    labels: [`IC ${ncPct}% para μ₁ − μ₂`],
-                                    datasets: [
-                                        { label: `L. Inferior: ${icLow}`, data: [icLow], backgroundColor: 'rgba(25,135,84,0.3)', borderColor: VERDE, borderWidth: 2 },
-                                        { label: `Diferencia:  ${diffMedias}`, data: [diffMedias], backgroundColor: VERDE, borderColor: VERDE, borderWidth: 3 },
-                                        { label: `L. Superior: ${icHigh}`, data: [icHigh], backgroundColor: 'rgba(25,135,84,0.3)', borderColor: VERDE, borderWidth: 2 }
-                                    ]
-                                },
-                                options: {
-                                    indexAxis: 'y',
-                                    responsive: true,
-                                    plugins: {
-                                        title: { display: true, text: `IC ${ncPct}% — Diferencia de Medias de Pesos (Hombres − Mujeres)`, font: { size: 14 } },
-                                        tooltip: { callbacks: { label: ctx => ` ${Number(ctx.raw).toFixed(4)} kg` } }
-                                    },
-                                    scales: { x: { title: { display: true, text: 'Diferencia (kg)' } } }
-                                }
-                            });
-
-                            // ── c: Curva t de Student y zona de rechazo ──────────────────────────────────
-                            function lnGamma(x) {
-                                const g = [76.18009172947146, -86.50532032941677, 24.01409824083091,
-                                    -1.231739572450155, 1.208650973866179e-3, -5.395239384953e-6];
-                                let y = x, tmp = x + 5.5;
-                                tmp -= (x + 0.5) * Math.log(tmp);
-                                let ser = 1.000000000190015;
-                                g.forEach(c => { ser += c / ++y; });
-                                return -tmp + Math.log(2.5066282746310005 * ser / x);
-                            }
-                            function tPDF(t, nu) {
-                                return Math.exp(
-                                    lnGamma((nu + 1) / 2) - lnGamma(nu / 2)
-                                    - 0.5 * Math.log(nu * Math.PI)
-                                    - (nu + 1) / 2 * Math.log(1 + t * t / nu)
-                                );
-                            }
-
-                            const xT = Array.from({ length: 400 }, (_, i) => -4.5 + 9 * i / 399);
-                            const yT = xT.map(t => tPDF(t, nu));
-                            const colores = xT.map(t => t < tCritHip ? 'rgba(220,53,69,0.55)' : 'rgba(13,110,253,0.18)');
-
-                            new Chart(document.getElementById('chartHipotesis'), {
-                                type: 'bar',
-                                data: {
-                                    labels: xT.map(t => t.toFixed(2)),
-                                    datasets: [
-                                        {
-                                            label: 'f(t)',
-                                            data: yT,
-                                            backgroundColor: colores,
-                                            borderColor: 'transparent',
-                                            barPercentage: 1.0,
-                                            categoryPercentage: 1.0
-                                        },
-                                        {
-                                            type: 'line',
-                                            label: `t obs = ${tStat}`,
-                                            data: xT.map((t, i) => Math.abs(t - tStat) < 9 / 399 * 2 ? yT[i] * 1.1 : null),
-                                            borderColor: rechazaH0 ? '#dc3545' : '#fd7e14',
-                                            borderWidth: 3, pointRadius: 0, fill: false
-                                        }
-                                    ]
-                                },
-                                options: {
-                                    responsive: true,
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: `Distribución t (ν=${nu})  |  t_obs = ${tStat}  |  t_crit = ${tCritHip}  |  p = ${pValor}`,
-                                            font: { size: 13 }
-                                        },
-                                        legend: { position: 'bottom' },
-                                        tooltip: { enabled: false }
-                                    },
-                                    scales: {
-                                        x: { ticks: { maxTicksLimit: 10, callback: (_, i) => Number(xT[i]).toFixed(1) }, title: { display: true, text: 'Valor t' } },
-                                        y: { display: false }
-                                    }
-                                }
-                            });
-                        </script>
+        <div class="decision-banner @(rechaza ? "decision-rechaza" : "decision-norechaza") mb-4">
+            <div class="decision-icon">@(rechaza ? "&#10060;" : "&#9989;")</div>
+            <div>
+                <div class="decision-title">@(rechaza ? "Se RECHAZA H&#8320;" : "No se rechaza H&#8320;")</div>
+                <div class="decision-text">
+                    p-valor (@Model.ValorP.ToString("F6"))
+                    @(rechaza ? Html.Raw("<strong>&lt;</strong>") : Html.Raw("<strong>&ge;</strong>"))
+                    &alpha; (@Model.NivelSignificancia.ToString("F3")) &mdash;
+                    @if (rechaza)
+                    {
+                        <text>Hay evidencia estadistica de que el IMC promedio es significativamente menor que @Model.MediaPoblacionalImc.ToString("F1").</text>
                     }
+                    else
+                    {
+                        <text>No hay evidencia suficiente para afirmar que el IMC promedio es menor que @Model.MediaPoblacionalImc.ToString("F1").</text>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-title"><i class="bi bi-graph-up me-1"></i>Distribucion t(&nu;=@(Model.NTotal-1)) &mdash; Zona de Rechazo</div>
+            <canvas id="chartHipotesis" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- â•â• TAB DATOS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div class="tab-pane fade" id="tab-datos" role="tabpanel">
+    <div class="tab-header tab-header-secondary">
+        <i class="bi bi-table me-2"></i>Base de Datos &mdash; 40 Pacientes
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-sm mb-0 tabla-pacientes">
+            <thead>
+                <tr>
+                    <th>#</th><th>Nombre</th><th>G</th><th>Edad</th>
+                    <th>Peso (kg)</th><th>Estatura (m)</th><th>IMC</th>
+                    <th>TGL</th><th>P. Sist.</th><th>P. Diast.</th>
+                    <th>Padecimientos</th><th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.Pacientes)
+                {
+                    <tr class="@(p.Genero == "M" ? "row-hombre" : "row-mujer")">
+                        <td>@p.Id</td>
+                        <td>@p.Nombre</td>
+                        <td><span class="badge @(p.Genero == "M" ? "bg-primary" : "bg-pink")">@(p.Genero == "M" ? "H" : "M")</span></td>
+                        <td>@p.Edad</td>
+                        <td><strong>@p.PesoKg?.ToString("F1")</strong></td>
+                        <td>@p.EstaturaM?.ToString("F2")</td>
+                        <td>@p.Imc?.ToString("F2")</td>
+                        <td>@p.TglMgDl</td>
+                        <td>@p.PresionSistolica</td>
+                        <td>@p.PresionDiastolica</td>
+                        <td>@p.Padecimientos</td>
+                        <td>@p.Fecha?.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</div><!-- end tab-content -->
+
+@section Scripts {
+<script>
+// â”€â”€ Datos del servidor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const pacientes  = @Html.Raw(pacientesJson);
+const hombres    = pacientes.filter(p => p.genero === 'M');
+const mujeres    = pacientes.filter(p => p.genero === 'F');
+const promedioG  = @Model.PromedioGeneralPeso.ToString("F4", inv);
+const promedioH  = @Model.PromedioHombresPeso.ToString("F4", inv);
+const promedioM  = @Model.PromedioMujeresPeso.ToString("F4", inv);
+const diffMedias = @Model.DiferenciaMedias.ToString("F4", inv);
+const se         = @Model.ErrorEstandar.ToString("F4", inv);
+const icLow      = @Model.ICLimiteInferior.ToString("F4", inv);
+const icHigh     = @Model.ICLimiteSuperior.ToString("F4", inv);
+const tStat      = @Model.TEstadistico.ToString("F4", inv);
+const tCritHip   = @Model.TCriticoHipotesis.ToString("F4", inv);
+const nu         = @(Model.NTotal - 1);
+const pValor     = @Model.ValorP.ToString("F6", inv);
+const rechazaH0  = @(Model.RechazaH0 ? "true" : "false");
+const ncPct      = '@((Model.NivelConfianza * 100).ToString("F1"))';
+
+// â”€â”€ Paleta United / Bootswatch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const C_ORANGE = 'rgba(233,84,32,0.85)';
+const C_BLUE   = 'rgba(55,101,167,0.85)';
+const C_GREEN  = 'rgba(56,180,74,0.85)';
+const C_RED    = 'rgba(223,56,44,0.85)';
+const C_YELLOW = 'rgba(239,183,62,0.85)';
+const C_GREY   = 'rgba(108,117,125,0.7)';
+
+// â”€â”€ Sync sliders <-> inputs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function syncParam(key, rawVal) {
+    const v = parseFloat(rawVal);
+    if (isNaN(v)) return;
+    const rng = document.getElementById('rng' + key);
+    const num = document.getElementById('num' + key);
+    if (document.activeElement === rng) num.value = rawVal;
+    else rng.value = v;
+}
+
+// â”€â”€ Gamma / t-PDF helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function lnGamma(x) {
+    const g = [76.18009172947146,-86.50532032941677,24.01409824083091,
+               -1.231739572450155,1.208650973866179e-3,-5.395239384953e-6];
+    let y = x, tmp = x+5.5; tmp -= (x+0.5)*Math.log(tmp);
+    let ser = 1.000000000190015; g.forEach(c => { ser += c / ++y; });
+    return -tmp + Math.log(2.5066282746310005 * ser / x);
+}
+function tPDF(t, nu) {
+    return Math.exp(lnGamma((nu+1)/2) - lnGamma(nu/2)
+        - 0.5*Math.log(nu*Math.PI) - (nu+1)/2*Math.log(1 + t*t/nu));
+}
+
+// â•â• GRAFICA a1: Barras de promedios â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+new Chart(document.getElementById('chartPromedios'), {
+    type: 'bar',
+    data: {
+        labels: ['General','Hombres','Mujeres'],
+        datasets: [{
+            label: 'Promedio de Peso (kg)',
+            data: [promedioG, promedioH, promedioM],
+            backgroundColor: [C_GREY, C_ORANGE, C_BLUE],
+            borderColor: ['#6c757d','#e95420','#3765a7'],
+            borderWidth: 2, borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.raw.toFixed(2)} kg` } }
+        },
+        scales: { y: { beginAtZero: false, min: 50, title: { display: true, text: 'kg' } } }
+    }
+});
+
+// â•â• GRAFICA a2: Dispersion individual pesos â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+new Chart(document.getElementById('chartPesos'), {
+    type: 'scatter',
+    data: {
+        datasets: [
+            {
+                label: 'Hombres',
+                data: hombres.map((p,i) => ({ x: i+1, y: Number(p.pesoKg) })),
+                backgroundColor: C_ORANGE, pointRadius: 8, pointHoverRadius: 10
+            },
+            {
+                label: 'Mujeres',
+                data: mujeres.map((p,i) => ({ x: i+1, y: Number(p.pesoKg) })),
+                backgroundColor: C_BLUE, pointRadius: 8, pointHoverRadius: 10
+            },
+            {
+                label: `x\u0305 = ${Number(promedioG).toFixed(2)} kg`,
+                data: [{x:0,y:promedioG},{x:Math.max(hombres.length,mujeres.length)+1,y:promedioG}],
+                type: 'line', borderColor: C_GREEN, borderWidth: 2,
+                borderDash: [6,4], pointRadius: 0, fill: false
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            tooltip: { callbacks: { label: ctx => {
+                if (ctx.datasetIndex < 2) {
+                    const arr = ctx.datasetIndex === 0 ? hombres : mujeres;
+                    return ` ${arr[ctx.dataIndex].nombre}: ${ctx.raw.y} kg`;
+                }
+                return ` ${ctx.dataset.label}`;
+            }}}
+        },
+        scales: {
+            x: { title: { display: true, text: 'Paciente #' } },
+            y: { title: { display: true, text: 'Peso (kg)' } }
+        }
+    }
+});
+
+// â•â• GRAFICA b: IC horizontal â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+new Chart(document.getElementById('chartIC'), {
+    type: 'bar',
+    data: {
+        labels: [`IC ${ncPct}%`],
+        datasets: [
+            { label: `L. Inferior: ${icLow}`,  data: [icLow],      backgroundColor: 'rgba(233,84,32,0.18)', borderColor: C_ORANGE, borderWidth: 2 },
+            { label: `Diferencia:  ${diffMedias}`, data: [diffMedias], backgroundColor: C_ORANGE,               borderColor: C_ORANGE, borderWidth: 3 },
+            { label: `L. Superior: ${icHigh}`, data: [icHigh],     backgroundColor: 'rgba(233,84,32,0.18)', borderColor: C_ORANGE, borderWidth: 2 }
+        ]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+            title: { display: true, text: `IC ${ncPct}% \u2014 Diferencia de Medias (Hombres \u2212 Mujeres)`, font: { size: 13 } },
+            tooltip: { callbacks: { label: ctx => ` ${Number(ctx.raw).toFixed(4)} kg` } }
+        },
+        scales: { x: { title: { display: true, text: 'Diferencia (kg)' } } }
+    }
+});
+
+// â•â• GRAFICA c: Curva t con zona de rechazo â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+const xT     = Array.from({length:400}, (_,i) => -4.5 + 9*i/399);
+const yT     = xT.map(t => tPDF(t, nu));
+const clrBar = xT.map(t => t < tCritHip ? 'rgba(223,56,44,0.55)' : 'rgba(55,101,167,0.18)');
+
+new Chart(document.getElementById('chartHipotesis'), {
+    type: 'bar',
+    data: {
+        labels: xT.map(t => t.toFixed(2)),
+        datasets: [
+            {
+                label: 'f(t)',
+                data: yT,
+                backgroundColor: clrBar,
+                borderColor: 'transparent',
+                barPercentage: 1.0, categoryPercentage: 1.0
+            },
+            {
+                type: 'line',
+                label: `t obs = ${tStat}`,
+                data: xT.map((t,i) => Math.abs(t - tStat) < 9/399*2 ? yT[i]*1.15 : null),
+                borderColor: rechazaH0 ? '#df382c' : '#efb73e',
+                borderWidth: 3, pointRadius: 0, fill: false
+            },
+            {
+                type: 'line',
+                label: `t crit = ${tCritHip}`,
+                data: xT.map((t,i) => Math.abs(t - tCritHip) < 9/399*2 ? yT[i]*1.15 : null),
+                borderColor: '#333', borderWidth: 2,
+                borderDash: [5,5], pointRadius: 0, fill: false
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: `t(\u03bd=${nu})  |  t_obs=${tStat}  |  t_crit=${tCritHip}  |  p=${pValor}`,
+                font: { size: 13 }
+            },
+            legend: { position: 'bottom' },
+            tooltip: { enabled: false }
+        },
+        scales: {
+            x: { ticks: { maxTicksLimit: 10, callback: (_,i) => Number(xT[i]).toFixed(1) }, title: { display: true, text: 'Valor t' } },
+            y: { display: false }
+        }
+    }
+});
+</script>
+}
+
